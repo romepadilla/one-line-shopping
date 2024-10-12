@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="css/index.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
+      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.js"
+      integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      $(function () {
+        $("#header").load("header.html");
+        $("#footer").load("footer.html");
+      });
+    </script>
+    <title>Shop Now!</title>
+  </head>
+  <body>
+    <!-- imported header -->
+    <div id="header"></div>
+    <div class="container mt-5">
+      <h1 class="mb-4">Products</h1>
+
+      <div id="productList" class="row">
+        <!-- Product Cards will be dynamically generated here -->
+      </div>
+
+      <div class="container mt-5">
+        <h2>Shopping Cart</h2>
+        <div id="cartList" class="row">
+          <!-- Cart Items will be dynamically generated here -->
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    // Retrieve submittedData from localStorage
+    let submittedData = JSON.parse(localStorage.getItem("submittedData")) || [];
+
+    // Map the submittedData to match the structure of the products array
+    let products = submittedData.map((item, index) => {
+      return {
+        id: index + 1, // Add an incremental ID
+        name: item.productName, // Map the product name
+        price: parseFloat(item.price) || 0, // Assuming price might be part of the form (replace with actual key)
+        discount: "0%", // You can add discount logic or keep it static
+        location: "Unknown", // You can add a location field or replace it
+        image: item.imageLocation || "placeholder.jpg", // Use the base64 image from localStorage
+      };
+    });
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    // Display the products (this could be part of your existing displayProducts function)
+    function displayProducts() {
+      const productList = document.getElementById("productList");
+      productList.innerHTML = ""; // Clear previous content
+
+      products.forEach((product) => {
+        const productCard = document.createElement("div");
+        productCard.classList.add("col-md-3", "mb-4");
+        productCard.innerHTML = `
+        <div class="card product-card">
+          <img src="${product.image}" class="card-img-top" alt="${
+          product.name
+        }">
+          <div class="card-body">
+            <h5 class="card-title">${product.name}</h5>
+            <p class="card-text">₱${product.price.toLocaleString()} <span class="text-danger">${
+          product.discount
+        } OFF</span></p>
+            <p class="card-text"><small class="text-muted">${
+              product.location
+            }</small></p>
+            <button class="btn btn-success add-to-cart-btn" onclick="addToCart(${
+              product.id
+            })">Add to Cart</button>
+          </div>
+        </div>
+      `;
+        productList.appendChild(productCard);
+      });
+    }
+
+    function displayCart() {
+      const cartList = document.getElementById("cartList");
+      cartList.innerHTML = ""; // Clear previous cart items
+
+      if (cart.length === 0) {
+        cartList.innerHTML = "<p>Your cart is empty.</p>";
+        return;
+      }
+
+      cart.forEach((item) => {
+        const cartItem = document.createElement("div");
+        cartItem.classList.add("col-md-3", "mb-4");
+        cartItem.innerHTML = `
+        <div class="card">
+          <img src="${item.image}" class="card-img-top" alt="${item.name}">
+          <div class="card-body">
+            <h5 class="card-title">${item.name}</h5>
+            <p class="card-text">₱${item.price.toLocaleString()}</p>
+            <button class="btn btn-danger" onclick="removeFromCart(${
+              item.id
+            })">Remove</button>
+          </div>
+        </div>
+      `;
+        cartList.appendChild(cartItem);
+      });
+    }
+
+    // Function to handle adding a product to the cart
+    function addToCart(productId) {
+      const product = products.find((p) => p.id === productId);
+      if (product) {
+        // Check if the product is already in the cart to avoid duplicates
+        const existingProduct = cart.find((item) => item.id === productId);
+        if (!existingProduct) {
+          cart.push(product);
+          localStorage.setItem("cart", JSON.stringify(cart)); // Update localStorage
+          alert(`${product.name} has been added to your cart.`);
+          displayCart(); // Refresh the cart display
+        } else {
+          alert(`${product.name} is already in your cart.`);
+        }
+      }
+    }
+
+    // Function to remove a product from the cart
+    function removeFromCart(productId) {
+      cart = cart.filter((item) => item.id !== productId); // Remove the product from the cart
+      localStorage.setItem("cart", JSON.stringify(cart)); // Update localStorage
+      displayCart(); // Refresh the cart display
+    }
+
+    // Call the displayProducts and displayCart functions on page load
+    window.onload = function () {
+      displayProducts();
+      displayCart();
+    };
+  </script>
+</html>

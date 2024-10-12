@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/header.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="header">
+      <a href="#default" class="logo">Shapi</a>
+      <div class="header-right">
+        <a href="index.html" class="nav-link" id="header1">Add Product</a>
+        <a href="shopping.html" class="nav-link" id="header2">Shop Now</a>
+        <a href="checkout.html" class="nav-link" id="header3">Checkout</a>
+      </div>
+    </div>
+  </body>
+  <script>
+    // Function to manage active class
+    function setActiveHeader() {
+      // Get the current active header from localStorage
+      const activeHeader = localStorage.getItem("activeHeader");
+
+      // If an active header exists in localStorage, set it to active
+      if (activeHeader) {
+        document.getElementById(activeHeader).classList.add("active");
+      }
+    }
+
+    // Set the active header in localStorage on click
+    const navLinks = document.querySelectorAll(".nav-link");
+    navLinks.forEach((link) => {
+      link.addEventListener("click", function () {
+        // Remove active class from all headers
+        navLinks.forEach((l) => l.classList.remove("active"));
+
+        // Add active class to the clicked header
+        this.classList.add("active");
+
+        // Save the active header in localStorage
+        localStorage.setItem("activeHeader", this.id);
+      });
+    });
+
+    // Set the active header when the page loads
+    setActiveHeader();
+  </script>
+</html>
